@@ -4,14 +4,20 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product; // Import the Product model
+
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $viewData = [];
         $viewData["title"] = "Products - Online Store";
         $viewData["subtitle"] = "List of products";
-        $viewData["products"] = Product::all();
+        $query = $request->get('q');
+        $viewData["search"] = $query;
+        $viewData["products"] = Product::query()
+            ->where('name', 'like', '%' . $query . '%')
+            ->paginate();
+        // $viewData["products"] = Product::paginate(8);
         return view('product.index')->with("viewData", $viewData);
     }
     public function show($id)

@@ -2,127 +2,124 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    // use HasFactory;
-   /**
-    * PRODUCT ATTRIBUTES
-    * $this->attributes['id'] - int - contains the product primary key (id)
-    * $this->attributes['name'] - string - contains the product name
-    * $this->attributes['description'] - string - contains the product description
-    * $this->attributes['image'] - string - contains the product image
-    * $this->attributes['price'] - int - contains the product price
-    * $this->attributes['created_at'] - timestamp - contains the product creation date
-    * $this->attributes['updated_at'] - timestamp - contains the product update date
-    */
     /**
-     * @return type
+     * PRODUCT ATTRIBUTES
+     * $this->attributes['id'] - int - contains the product primary key (id)
+     * $this->attributes['name'] - string - contains the product name
+     * $this->attributes['description'] - string - contains the product description
+     * $this->attributes['image'] - string - contains the product image
+     * $this->attributes['price'] - int - contains the product price
+     * $this->attributes['created_at'] - timestamp - contains the product creation date
+     * $this->attributes['updated_at'] - timestamp - contains the product update date
+     * $this->items - Item[] - contains the associated items
      */
 
+    public static function validate($request)
+    {
+        $request->validate([
+            "name" => "required|max:255",
+            "description" => "required",
+            "price" => "required|numeric|gt:0",
+            'image' => 'image',
+        ]);
+    }
 
-    protected $fillable = [
-        'name',
-        'description',
-        'price',
-        'image',
-        ];
+    public static function sumPricesByQuantities($products, $productsInSession)
+    {
+        $total = 0;
+        foreach ($products as $product) {
+            $total = $total + ($product->getPrice()*$productsInSession[$product->getId()]);
+        }
+
+        return $total;
+    }
+
     public function getId()
     {
         return $this->attributes['id'];
     }
-    /**
-     * @param type $id
-     */
+
     public function setId($id)
     {
         $this->attributes['id'] = $id;
     }
-    /**
-     * @return type
-     */
-    public function getname()
+
+    public function getName()
     {
         return $this->attributes['name'];
     }
-    /**
-     * @param type $name
-     */
+
     public function setName($name)
     {
         $this->attributes['name'] = $name;
     }
-    /**
-     * @return type
-     */
+
     public function getDescription()
     {
         return $this->attributes['description'];
     }
-    /**
-     * @param type $description
-     */
-    public function setdescription($description)
+
+    public function setDescription($description)
     {
         $this->attributes['description'] = $description;
     }
-    /**
-     * @return type
-     */
+
     public function getImage()
     {
         return $this->attributes['image'];
-
     }
-    /**
-     * @param type $image
-     */
+
     public function setImage($image)
     {
         $this->attributes['image'] = $image;
     }
-    /**
-     * @return type
-     */
+
     public function getPrice()
     {
-        return $this->price;
+        return $this->attributes['price'];
     }
-    /**
-     * @param type $price
-     */
+
     public function setPrice($price)
     {
         $this->attributes['price'] = $price;
     }
-    /**
-     * @return type
-     */
-    public function getCreated_at()
+
+    public function getCreatedAt()
     {
-        return $this->created_at;
+        return $this->attributes['created_at'];
     }
-    /**
-     * @param type $created_ad
-     */
-    public function setCreated_ad($created_ad)
+
+    public function setCreatedAt($createdAt)
     {
-        $this->attributes['created_ad'] = $created_ad;
+        $this->attributes['created_at'] = $createdAt;
     }
-    /**
-     * @return type
-     */
-    public function getUpdate_at()
+
+    public function getUpdatedAt()
     {
-        return $this->update_at;
+        return $this->attributes['updated_at'];
     }
-    /**
-     * @param type $update_at
-     */
-    public function setUpdate_at($update_at)
+
+    public function setUpdatedAt($updatedAt)
     {
-        $this->attributes['update_at'] = $update_at;
+        $this->attributes['updated_at'] = $updatedAt;
+    }
+
+    public function items()
+    {
+        return $this->hasMany(Item::class);
+    }
+
+    public function getItems()
+    {
+        return $this->items;
+    }
+
+    public function setItems($items)
+    {
+        $this->items = $items;
     }
 }
